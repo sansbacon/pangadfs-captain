@@ -1,0 +1,25 @@
+{
+  "ga_settings": {
+    "n_generations": 10,
+    "population_size": 5000,
+    "points_column": "proj",
+    "salary_column": "salary",
+    "csvpth": "pool.csv"
+  },
+  
+  "site_settings": {
+    "salary_cap": 50000,
+    "lineup_size": 6,
+    "posthresh": 2
+  },
+  
+  "plugin_names": {
+    "pool": "pool_default",
+    "pospool": "pospool_captain",
+    "populate": "populate_captain",
+    "crossover": "crossover_default",
+    "mutate": "mutate_default",
+    "fitness": "fitness_captain",
+    "validate": ["salary_validate_captain", "duplicate_validate_captain"]
+  }
+}

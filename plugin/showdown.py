@@ -1,24 +1,41 @@
-# pangadfs-captain/captain.py
+# pangadfs-showdown/showdown.py
 # plugins for showdown captain mode
 
-from typing import Dict
+from typing import Dict, Union
 
 import numpy as np
 import pandas as pd
 
 from pangadfs.base import PospoolBase, FitnessBase, ValidateBase
-from pangadfs.default import PopulateDefault
+from pangadfs.populate import PopulateDefault
 
 
-class CaptainPospool(PospoolBase):
+Number = Union[int, float]
+
+
+def _showdown_sum(x: np.ndarray, mapping: Dict[int, Number]):
+    """Calculates sum for showdown lineup
+    
+    Args:
+        x (np.ndarray): array of integers
+        mapping (Dict[int, Number]): key is index, value is float or int to sum
+    
+    Returns:
+        Number: sum for the lineup
+
+    """    
+    # population is setup so captain is in first slot
+    # easier to multiply first value by 1.5 than maintain two sets of players
+    return sum([mapping[i] * 1.5 if i == 0 else mapping[i] for i in x]
+
+
+class ShowdownPospool(PospoolBase):
 
     def pospool(self,
                 *,
                 pool: pd.DataFrame,
                 posfilter: float,
-                pointscol: str = 'proj',
-                salcol: str = 'salary',
-                positioncol: str = 'pos'
+                column_mapping: Dict[str, str]
                 ):
         """Creates initial position pool. Don't need duplicate players for CAPTAIN/FLEX.
            Will handle multiplier at the fitness and validate levels
@@ -26,24 +43,25 @@ class CaptainPospool(PospoolBase):
         Args:
             pool (pd.DataFrame):
             posfilter (float): points threshold
+            column_mapping (Dict[str, str]): maps points, salary, and position column
  
         Returns:
             pd.DataFrame
 
         """
         tmp = pool.loc[pool[pointscol] >= posfilter, :]
-        prob_ = (tmp[pointscol] / tmp[salcol]) * 1000
+        prob_ = (tmp[column_mapping.get('points')] / tmp[column_mapping.get('salary')]) * 1000
         prob_ = prob_ / prob_.sum()
         return tmp.assign(prob=prob_)
 
 
-class CaptainPopulate(PopulateDefault):
+class ShowdownPopulate(PopulateDefault):
 
     def populate(self,
                  *, 
-                 pospool, 
+                 pospool: Dict[str, pd.DataFrame], 
                  population_size: int, 
-                 probcol: str='prob'):
+                 probcol: str = 'prob'):
         """Creates individuals in population
         
         Args:
@@ -52,9 +70,10 @@ class CaptainPopulate(PopulateDefault):
             probcol (str): the dataframe column with probabilities
 
         Returns:
-            ndarray of size (population_size, 6)
+            np.ndarray: array of size (population_size, 6)
 
         """
+        # multidimensional_shifting inherited from PopulateDefault
         return self.multidimensional_shifting(
           elements=pospool.index, 
           num_samples=population_size, 
@@ -63,7 +82,8 @@ class CaptainPopulate(PopulateDefault):
         )
 
 
-class CaptainFitness(FitnessBase):
+class ShowdownFitness(FitnessBase):
+
 
     def fitness(self,
                 *, 
@@ -79,10 +99,10 @@ class CaptainFitness(FitnessBase):
             np.ndarray: 1D array of float
 
         """
-        return np.apply_along_axis(lambda x: sum([points_mapping[i] * 1.5 if i == 0 else points_mapping[i] for i in x]), axis=1, arr=population)
+        return np.apply_along_axis(_showdown_sum, axis=1, arr=population, mapping=points_mapping)
 
 
-class CaptainSalaryValidate(ValidateBase):
+class ShowdownSalaryValidate(ValidateBase):
 
     def validate(self,
                  *, 
@@ -91,19 +111,8 @@ class CaptainSalaryValidate(ValidateBase):
                  salary_cap: int,
                  **kwargs):
         """Ensures valid individuals in population"""
-        popsal = np.apply_along_axis(lambda x: sum([salary_mapping[i] * 1.5 if i == 0 else salary_mapping[i] for i in x]), axis=1, arr=population)
+        popsal= np.apply_along_axis(_showdown_sum, axis=1, arr=population, mapping=salary_mapping)
         return population[popsal <= salary_cap]
-
-
-class CaptainDuplicatesValidate(ValidateBase):
-
-    def validate(self,
-                 *, 
-                 population: np.ndarray, 
-                 **kwargs):
-        """Ensures valid individuals in population"""
-        uqcnt = np.apply_along_axis(lambda x: len(np.unique(x)), 1, population)
-        return population[uqcnt == 6]
 
 
 if __name__ == '__main__':

@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 
 def run():
     setup(
-        name='pangadfs-captain',
+        name='pangadfs-showdown',
         packages=find_packages(),
         entry_points={
-          'pangadfs.pospool': ['pospool_captain = plugin.captain:CaptainPospool'],
-          'pangadfs.populate': ['populate_captain = plugin.captain:CaptainPopulate'],
-          'pangadfs.fitness': ['fitness_captain = plugin.captain:CaptainFitness'],
-          'pangadfs.validate': ['salary_validate_captain = plugin.captain:CaptainSalaryValidate',
-                                'duplicate_validate_captain = plugin.captain:CaptainDuplicatesValidate'],
+          'pangadfs.pospool': ['pospool_showdown = plugin.showdown:ShowdownPospool'],
+          'pangadfs.populate': ['populate_showdown = plugin.showdown:ShowdownPopulate'],
+          'pangadfs.fitness': ['fitness_showdown = plugin.showdown:ShowdownFitness'],
+          'pangadfs.validate': ['salary_validate_showdown = plugin.showdown:ShowdownSalaryValidate',
+                                'duplicate_validate_showdown = plugin.showdown:ShowdownDuplicatesValidate'],
         },
         zip_safe=False,
     )

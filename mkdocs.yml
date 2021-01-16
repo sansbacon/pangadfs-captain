@@ -1,0 +1,27 @@
+# site configuration
+site_name: pangadfs
+site_url: https://sansbacon.github.io/pangadfs-showdown/
+site_description: plugin for pangadfs to enable showdown contests
+site_author: Eric Truett
+repo_url: https://github.com/sansbacon/pangadfs-showdown
+
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings
+
+markdown_extensions:
+  - toc
+  - admonition
+  - def_list
+  - pymdownx.tabbed
+  - pymdownx.superfences
+
+nav:
+    - Home: index.md
+    - Building Apps with pangadfs-showdown: building-apps.md
+    - Code Reference:
+        - showdown: showdown-reference.md
+

@@ -6,11 +6,11 @@ def run():
         name='pangadfs-showdown',
         packages=find_packages(),
         entry_points={
-          'pangadfs.pospool': ['pospool_showdown = plugin.showdown:ShowdownPospool'],
-          'pangadfs.populate': ['populate_showdown = plugin.showdown:ShowdownPopulate'],
-          'pangadfs.fitness': ['fitness_showdown = plugin.showdown:ShowdownFitness'],
-          'pangadfs.validate': ['salary_validate_showdown = plugin.showdown:ShowdownSalaryValidate',
-                                'duplicate_validate_showdown = plugin.showdown:ShowdownDuplicatesValidate'],
+          'pangadfs.pospool': ['pospool_showdown = pangadfs_showdown.showdown:ShowdownPospool'],
+          'pangadfs.populate': ['populate_showdown = pangadfs_showdown.showdown:ShowdownPopulate'],
+          'pangadfs.fitness': ['fitness_showdown = pangadfs_showdown.showdown:ShowdownFitness'],
+          'pangadfs.validate': ['salary_validate_showdown = pangadfs_showdown.showdown:ShowdownSalaryValidate'],
+          'console_scripts': ['showdown=app.app:run']
         },
         zip_safe=False,
     )

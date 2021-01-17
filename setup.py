@@ -10,7 +10,7 @@ def run():
           'pangadfs.populate': ['populate_showdown = pangadfs_showdown.showdown:ShowdownPopulate'],
           'pangadfs.fitness': ['fitness_showdown = pangadfs_showdown.showdown:ShowdownFitness'],
           'pangadfs.validate': ['salary_validate_showdown = pangadfs_showdown.showdown:ShowdownSalaryValidate'],
-          'console_scripts': ['showdown=app.app:run']
+          'console_scripts': ['showdown=pangadfs_showdown.app.app:run']
         },
         zip_safe=False,
     )

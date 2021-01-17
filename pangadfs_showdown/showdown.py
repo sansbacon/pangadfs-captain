@@ -1,4 +1,4 @@
-# pangadfs-showdown/showdown.py
+# pangadfs_showdown/showdown.py
 # plugins for showdown captain mode
 
 from typing import Dict, Union
@@ -27,7 +27,7 @@ def _showdown_sum(x: np.ndarray, y: np.array):
     """    
     # population is setup so captain is in first slot
     # easier to multiply first value by 1.5 than maintain two sets of players
-    return sum([y[i] * 1.5 if i == 0 else y[i] for i in x])
+    return np.sum(y[x] * np.array([1.5, 1, 1, 1, 1, 1]))
 
 
 class ShowdownPospool(PospoolBase):
@@ -36,7 +36,8 @@ class ShowdownPospool(PospoolBase):
                 *,
                 pool: pd.DataFrame,
                 posfilter: float,
-                column_mapping: Dict[str, str]
+                column_mapping: Dict[str, str],
+                **kwargs
                 ) -> pd.DataFrame:
         """Creates initial position pool. Don't need duplicate players for CAPTAIN/FLEX.
            Will handle multiplier at the fitness and validate levels
@@ -64,7 +65,8 @@ class ShowdownPopulate(PopulateDefault):
                  *, 
                  pospool: Dict[str, pd.DataFrame], 
                  population_size: int, 
-                 probcol: str = 'prob'
+                 probcol: str = 'prob',
+                 **kwargs
                 ) -> np.ndarray:
         """Creates individuals in population
         
@@ -91,7 +93,8 @@ class ShowdownFitness(FitnessBase):
     def fitness(self,
                 *, 
                 population: np.ndarray, 
-                points: np.ndarray
+                points: np.ndarray,
+                **kwargs
                ) -> np.ndarray:
         """Assesses population fitness using supplied mapping
         
@@ -116,7 +119,7 @@ class ShowdownSalaryValidate(ValidateBase):
                  **kwargs
                 ) -> np.ndarray:
         """Ensures valid individuals in population"""
-        popsal= np.apply_along_axis(_showdown_sum, axis=1, arr=population, y=salaries)
+        popsal = np.apply_along_axis(_showdown_sum, axis=1, arr=population, y=salaries)
         return population[popsal <= salary_cap]
 
 

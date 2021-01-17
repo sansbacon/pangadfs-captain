@@ -1,4 +1,4 @@
-# pangadfs-showdown/tests/test_showdown.py
+# pangadfs_showdown/tests/test_showdown.py
 # -*- coding: utf-8 -*-
 # Copyright (C) 2020 Eric Truett
 # Licensed under the MIT License
@@ -25,10 +25,11 @@ def pp(p):
 def pop(pp):
     return ShowdownPopulate().populate(pospool=pp, population_size=50)
 
-def test_showdown_sum():
+
+def test_showdown_sum(tprint):
     """Tests _showdown_sum"""
-    x = np.arange(3)
-    y = np.array([5, 2.5, 10])
+    x = np.arange(6)
+    y = np.array([5, 2.5, 10, 0, 0, 0])
     assert _showdown_sum(x, y) == 20
 
 
@@ -85,5 +86,3 @@ def test_validate(p, pp):
     assert len(valid) < len(population)
     popsal = np.apply_along_axis(_showdown_sum, axis=1, arr=valid, y=salaries)
     assert not np.any(popsal > salary_cap)
-        
-

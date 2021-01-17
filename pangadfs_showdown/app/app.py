@@ -1,4 +1,4 @@
-# pangadfs-showdown/app/app.py
+# pangadfs_showdown/app/app.py
 # -*- coding: utf-8 -*-
 # Copyright (C) 2020 Eric Truett
 # Licensed under the MIT License
@@ -6,6 +6,7 @@
 import logging
 
 from pangadfs.ga import GeneticAlgorithm
+from pangadfs_showdown.showdown import _showdown_sum
 from pathlib import Path
 
 import numpy as np
@@ -21,22 +22,22 @@ def run():
 		'ga_settings': {
 			'crossover_method': 'uniform',
 			'csvpth': Path(__file__).parent / 'pool.csv',
-			'elite_divisor': 5,
+			'elite_divisor': 10,
 			'elite_method': 'fittest',
-			'mutation_rate': .05,
+			'mutation_rate': .10,
 			'n_generations': 20,
 			'points_column': 'proj',
 			'population_size': 5000,
 			'position_column': 'pos',
 			'salary_column': 'salary',
-			'select_method': 'roulette',
+			'select_method': 'diverse',
 			'stop_criteria': 10,
 			'verbose': True
 		},
 
 		'site_settings': {
 			'lineup_size': 6,
-			'posfilter': 3.0,
+			'posfilter': 2.0,
 			'salary_cap': 50000
 		}
 	}
@@ -44,11 +45,12 @@ def run():
 	
 	plugin_names = {
   	  'pool': 'pool_default',
-	  'pospool': 'pospool_captain',
-	  'populate': 'populate_captain',
+	  'pospool': 'pospool_showdown',
+	  'populate': 'populate_showdown',
 	  'crossover': 'crossover_default',
 	  'mutate': 'mutate_default',
-	  'fitness': 'fitness_captain',
+	  'fitness': 'fitness_showdown',
+	  'select': 'select_default'
 	}
 
 	validate_names = ['salary_validate_showdown', 'validate_duplicates']
@@ -68,8 +70,7 @@ def run():
 			'position': ctx['ga_settings']['position_column'],
 			'salary': ctx['ga_settings']['salary_column']}
 	posfilter = ctx['site_settings']['posfilter']
-	flex_positions = ctx['site_settings']['flex_positions']
-	pospool = ga.pospool(pool=pool, posfilter=posfilter, column_mapping=cmap, flex_positions=flex_positions)
+	pospool = ga.pospool(pool=pool, posfilter=posfilter, column_mapping=cmap)
 
 	# create salary and points arrays
 	# these match indices of pool
@@ -81,7 +82,6 @@ def run():
 	# create initial population
 	initial_population = ga.populate(
 		pospool=pospool, 
-		posmap=ctx['site_settings']['posmap'], 
 		population_size=pop_size
 	)
 
@@ -102,9 +102,13 @@ def run():
 	)
 
 	# set overall_max based on initial population
+	#popsal = np.apply_along_axis(_showdown_sum, axis=1, arr=initial_population, y=salaries)
 	omidx = population_fitness.argmax()
 	best_fitness = population_fitness[omidx]
 	best_lineup = initial_population[omidx]
+	#print(pool.loc[best_lineup])
+	#print(best_fitness)
+	#print(popsal[omidx])
 
 	# create new generations
 	n_unimproved = 0
@@ -178,7 +182,7 @@ def run():
 	# will break after n_generations or when stop_criteria reached
 	print(pool.loc[best_lineup, :])
 	print(f'Lineup score: {best_fitness}')
-	
+
 
 if __name__ == '__main__':
 	run()
